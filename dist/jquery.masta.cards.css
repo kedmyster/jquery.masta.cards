@@ -1,0 +1,12 @@
+body {
+  overflow-y: hidden; }
+
+.cards {
+  position: relative; }
+  .cards .card {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0; }
+  .cards .card-last {
+    overflow-y: auto; }
