@@ -21,6 +21,8 @@
     animation_timing: "ease"
   };
 
+var touchLastY = 0;
+
   /**
    * Constructor.
    *
@@ -78,15 +80,20 @@
       $(document).on('mousewheel DOMMouseScroll wheel MozMousePixelScroll', function(e) {
         self.moveMouse(e);
       });
-      var touchLastY;
       $(document).on('touchmove', function(e) {
         self.moveTouch(e);
       });
     },
 
     init: function() {
+      var self = this;
+
       // Set the first card as the default card
       this.$active = $(this.$cards[0]).addClass("active");
+
+      $(this.options.moveDownSelector).click(function() {
+        self.moveDown();
+      });
 
       // Position each of the cards
       for (var i=0; i<this.$cards.length; i++) {
@@ -103,6 +110,10 @@
           $card.css({
             top: $(window).height()+"px"
           });
+        }
+
+        if (this.options.onAfterInit) {
+          this.options.onAfterInit();
         }
       }
     },
@@ -198,25 +209,26 @@
 
       var currentY = e.originalEvent.touches ? e.originalEvent.touches[0].pageY : e.pageY;
 
-      if (Math.abs(currentY-lastY) < 10) {
+      if (Math.abs(currentY-touchLastY) < 10) {
         return;
       }
 
-      if (currentY <= lastY) { // up
+      if (currentY <= touchLastY) { // up
         self.moveUp();
 
         // prevent the default action (scroll / move caret)
         e.preventDefault();
+        touchLastY = currentY;
         return;
       } else { // down
         self.moveDown();
 
         // prevent the default action (scroll / move caret)
         e.preventDefault();
+        touchLastY = currentY;
         return;
       }
 
-      touchLastY = currentY;
     },
 
     moveUp: function() {
@@ -286,7 +298,7 @@
       }
     },
 
-    moveDown: function(index) {
+    moveDown: function() {
       var self = this;
       var currentIndex = $(this.$active).index();
 
